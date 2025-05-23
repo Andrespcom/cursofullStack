@@ -1,42 +1,76 @@
+/* Layout base */
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
+  max-width: 600px;
+  margin: 2rem auto;
   padding: 2rem;
-  text-align: center;
+  font-family: Arial, sans-serif;
+  color: #333;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+/* Títulos */
+h2, h3 {
+  border-bottom: 2px solid #ddd;
+  padding-bottom: 5px;
+  margin-bottom: 15px;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* Inputs y Botones */
+input {
+  padding: 8px;
+  margin: 5px 0;
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+button {
+  padding: 8px 12px;
+  margin-top: 5px;
+  border: none;
+  border-radius: 4px;
+  background-color: #1976d2;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s;
 }
 
-.card {
-  padding: 2em;
+button:hover {
+  background-color: #125ea2;
 }
 
-.read-the-docs {
-  color: #888;
+/* Notificaciones */
+.notification {
+  color: green;
+  background: #e0ffe0;
+  border-left: 5px solid green;
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 4px;
+}
+
+.error {
+  color: red;
+  background: #ffe0e0;
+  border-left: 5px solid red;
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 4px;
+}
+
+/* Lista de personas */
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #ddd;
 }
