@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const baseUrl = 'https://cursofullstack-h15w--3001--4d9fd228.local-credentialless.webcontainer.io/persons'
+const baseUrl = 'https://phonebook-backend-kwgg.onrender.com'
 
 const getAll = () => {
   return axios.get(baseUrl).then(response => response.data)
