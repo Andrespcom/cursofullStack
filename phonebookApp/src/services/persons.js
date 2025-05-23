@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const baseUrl = 'https://phonebook-backend-kwgg.onrender.com'
+const baseUrl = 'https://phonebook-backend-kwgg.onrender.com/api/persons'
 
 const getAll = () => {
   return axios.get(baseUrl).then(response => response.data)
