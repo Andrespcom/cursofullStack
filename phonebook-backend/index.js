@@ -26,6 +26,23 @@ app.get('/api/persons', (req, res) => {
   res.json(persons)
 })
 
+app.post('/api/persons', (req, res) => {
+  const { name, number } = req.body
+
+  if (!name || !number) {
+    return res.status(400).json({ error: 'name or number missing' })
+  }
+
+  const newPerson = {
+    id: Math.floor(Math.random() * 1000000),
+    name,
+    number
+  }
+
+  persons = persons.concat(newPerson)
+  res.status(201).json(newPerson)
+})
+
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
