@@ -43,6 +43,27 @@ app.post('/api/persons', (req, res) => {
   res.status(201).json(newPerson)
 })
 
+app.delete('/api/persons/:id', (req, res) => {
+  const id = Number(req.params.id)
+  persons = persons.filter(person => person.id !== id)
+  res.status(204).end()
+})
+
+app.put('/api/persons/:id', (req, res) => {
+  const id = Number(req.params.id)
+  const { name, number } = req.body
+
+  const existing = persons.find(p => p.id === id)
+  if (!existing) {
+    return res.status(404).json({ error: 'person not found' })
+  }
+
+  const updatedPerson = { ...existing, number }
+  persons = persons.map(p => p.id === id ? updatedPerson : p)
+
+  res.json(updatedPerson)
+})
+
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
