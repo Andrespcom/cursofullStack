@@ -1,8 +1,8 @@
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
-
 const app = express()
+const path = require('path');
 
 app.use(cors())
 
@@ -11,6 +11,9 @@ morgan.token('body', (req) => {
 })
 
 app.use(express.json())
+
+app.use(express.static(path.resolve(__dirname, 'build')));
+
 app.use(
   morgan(':method :url :status :res[content-length] - :response-time ms :body')
 )
@@ -63,6 +66,10 @@ app.put('/api/persons/:id', (req, res) => {
 
   res.json(updatedPerson)
 })
+
+app.get('*', (req, res) => {
+  res.sendFile(path.resolve(__dirname, 'build', 'index.html'));
+});
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
