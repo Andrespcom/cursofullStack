@@ -67,9 +67,9 @@ app.put('/api/persons/:id', (req, res) => {
 })
 
 // Última ruta: servir frontend si no coincide ninguna API
-app.get('*', (req, res) => {
-  res.sendFile(path.resolve(__dirname, 'build', 'index.html'))
-})
+app.get('/*', (req, res) => {
+  res.sendFile(path.resolve(__dirname, 'build', 'index.html'));
+});
 
 // Inicio del servidor
 const PORT = process.env.PORT || 3001
