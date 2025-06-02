@@ -17,13 +17,14 @@ morgan.token("body", (req) => {
   return req.method === "POST" ? JSON.stringify(req.body) : "";
 });
 app.use(
-  morgan(":method :url :status :res[content-length] - :response-time ms :body"),
+  morgan(":method :url :status :res[content-length] - :response-time ms :body")
 );
 
 // Servir frontend desde carpeta build
 app.use(express.static(path.resolve(__dirname, "build")));
 
 // Rutas API
+
 // GET todas las personas desde MongoDB
 app.get("/api/persons", (req, res, next) => {
   Person.find({})
@@ -61,7 +62,7 @@ app.put("/api/persons/:id", (req, res, next) => {
   Person.findByIdAndUpdate(
     req.params.id,
     { name, number },
-    { new: true, runValidators: true, context: "query" },
+    { new: true, runValidators: true, context: "query" }
   )
     .then((updatedPerson) => res.json(updatedPerson))
     .catch((error) => next(error));
@@ -70,6 +71,17 @@ app.put("/api/persons/:id", (req, res, next) => {
 // Última ruta: servir frontend si no coincide ninguna API
 app.get("/*", (req, res) => {
   res.sendFile(path.resolve(__dirname, "build", "index.html"));
+});
+
+// Manejo de errores
+app.use((error, req, res, next) => {
+  console.error(error.message);
+
+  if (error.name === "CastError") {
+    return res.status(400).send({ error: "malformatted id" });
+  }
+
+  next(error);
 });
 
 // Inicio del servidor
