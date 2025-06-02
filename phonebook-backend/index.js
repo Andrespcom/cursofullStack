@@ -1,91 +1,100 @@
 require("dotenv").config();
-const express = require("express");
-const morgan = require("morgan");
-const cors = require("cors");
-const path = require("path");
+const mongoose = require("mongoose");
 
-const Person = require("./models/persons");
+mongoose.set("strictQuery", false);
 
-const app = express();
+const url = process.env.MONGODB_URI;
 
-// Middlewares
-app.use(cors());
-app.use(express.json());
+mongoose
+  .connect(url)
+  .then(() => {
+    console.log("✅ Conectado a MongoDB");
 
-// Morgan para loguear solicitudes, incluyendo el body en POST
-morgan.token("body", (req) => {
-  return req.method === "POST" ? JSON.stringify(req.body) : "";
-});
-app.use(
-  morgan(":method :url :status :res[content-length] - :response-time ms :body")
-);
+    // Luego de la conexión exitosa, continuar con el servidor
+    startServer();
+  })
+  .catch((error) => {
+    console.error("❌ Error conectando a MongoDB:", error.message);
+  });
 
-// Servir frontend desde carpeta build
-app.use(express.static(path.resolve(__dirname, "build")));
+function startServer() {
+  const express = require("express");
+  const morgan = require("morgan");
+  const cors = require("cors");
+  const path = require("path");
+  const Person = require("./models/persons");
 
-// Rutas API
+  const app = express();
 
-// GET todas las personas desde MongoDB
-app.get("/api/persons", (req, res, next) => {
-  Person.find({})
-    .then((persons) => res.json(persons))
-    .catch((error) => next(error));
-});
+  // Middlewares
+  app.use(cors());
+  app.use(express.json());
 
-// POST para añadir una persona nueva
-app.post("/api/persons", (req, res, next) => {
-  const { name, number } = req.body;
+  morgan.token("body", (req) =>
+    req.method === "POST" ? JSON.stringify(req.body) : "",
+  );
+  app.use(
+    morgan(
+      ":method :url :status :res[content-length] - :response-time ms :body",
+    ),
+  );
 
-  if (!name || !number) {
-    return res.status(400).json({ error: "name or number missing" });
-  }
+  app.use(express.static(path.resolve(__dirname, "build")));
 
-  const person = new Person({ name, number });
+  // Rutas
+  app.get("/api/persons", (req, res, next) => {
+    Person.find({})
+      .then((persons) => res.json(persons))
+      .catch((error) => next(error));
+  });
 
-  person
-    .save()
-    .then((savedPerson) => res.json(savedPerson))
-    .catch((error) => next(error));
-});
+  app.post("/api/persons", (req, res, next) => {
+    const { name, number } = req.body;
 
-// DELETE una persona por ID usando MongoDB
-app.delete("/api/persons/:id", (req, res, next) => {
-  Person.findByIdAndDelete(req.params.id)
-    .then(() => res.status(204).end())
-    .catch((error) => next(error));
-});
+    if (!name || !number) {
+      return res.status(400).json({ error: "name or number missing" });
+    }
 
-// PUT para actualizar un número
-app.put("/api/persons/:id", (req, res, next) => {
-  const { name, number } = req.body;
+    const person = new Person({ name, number });
 
-  Person.findByIdAndUpdate(
-    req.params.id,
-    { name, number },
-    { new: true, runValidators: true, context: "query" }
-  )
-    .then((updatedPerson) => res.json(updatedPerson))
-    .catch((error) => next(error));
-});
+    person
+      .save()
+      .then((savedPerson) => res.json(savedPerson))
+      .catch((error) => next(error));
+  });
 
-// Última ruta: servir frontend si no coincide ninguna API
-app.get("/*", (req, res) => {
-  res.sendFile(path.resolve(__dirname, "build", "index.html"));
-});
+  app.delete("/api/persons/:id", (req, res, next) => {
+    Person.findByIdAndDelete(req.params.id)
+      .then(() => res.status(204).end())
+      .catch((error) => next(error));
+  });
 
-// Manejo de errores
-app.use((error, req, res, next) => {
-  console.error(error.message);
+  app.put("/api/persons/:id", (req, res, next) => {
+    const { name, number } = req.body;
 
-  if (error.name === "CastError") {
-    return res.status(400).send({ error: "malformatted id" });
-  }
+    Person.findByIdAndUpdate(
+      req.params.id,
+      { name, number },
+      { new: true, runValidators: true, context: "query" },
+    )
+      .then((updatedPerson) => res.json(updatedPerson))
+      .catch((error) => next(error));
+  });
 
-  next(error);
-});
+  app.get("/*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "build", "index.html"));
+  });
 
-// Inicio del servidor
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+  app.use((error, req, res, next) => {
+    console.error(error.message);
+    if (error.name === "CastError") {
+      return res.status(400).send({ error: "malformatted id" });
+    }
+    next(error);
+  });
+
+  const PORT = process.env.PORT || 3001;
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+  });
+}
