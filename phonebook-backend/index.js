@@ -23,6 +23,7 @@ function startServer() {
   const cors = require("cors");
   const path = require("path");
   const Person = require("./models/persons");
+  const errorHandler = require("./middleware/errorHandler");
 
   const app = express();
 
@@ -45,6 +46,29 @@ function startServer() {
   app.get("/api/persons", (req, res, next) => {
     Person.find({})
       .then((persons) => res.json(persons))
+      .catch((error) => next(error));
+  });
+
+  app.get("/api/persons/:id", (req, res, next) => {
+    Person.findById(req.params.id)
+      .then((person) => {
+        if (person) {
+          res.json(person);
+        } else {
+          res.status(404).end();
+        }
+      })
+      .catch((error) => next(error));
+  });
+
+  app.get("/info", (req, res, next) => {
+    Person.countDocuments({})
+      .then((count) => {
+        res.send(`
+          <p>Phonebook has info for ${count} people</p>
+          <p>${new Date()}</p>
+        `);
+      })
       .catch((error) => next(error));
   });
 
@@ -85,13 +109,8 @@ function startServer() {
     res.sendFile(path.resolve(__dirname, "build", "index.html"));
   });
 
-  app.use((error, req, res, next) => {
-    console.error(error.message);
-    if (error.name === "CastError") {
-      return res.status(400).send({ error: "malformatted id" });
-    }
-    next(error);
-  });
+  // ✅ Middleware de errores (al final)
+  app.use(errorHandler);
 
   const PORT = process.env.PORT || 3001;
   app.listen(PORT, () => {
