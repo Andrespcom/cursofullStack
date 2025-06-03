@@ -42,33 +42,40 @@ const App = () => {
         const updatedPerson = { ...existingPerson, number: newNumber }
   
         personService
-          .update(existingPerson.id, updatedPerson)
-          .catch(error => {
-            setNotification(`Information of ${existingPerson.name} has already been removed from server`)
-            setNotificationType('error')
-            setTimeout(() => setNotification(null), 5000)
-            setPersons(persons.filter(p => p.id !== existingPerson.id))
-          })
-          .then(returnedPerson => {
-            setPersons(persons.map(p => p.id !== existingPerson.id ? p : returnedPerson))
-            setNewName('')
-            setNewNumber('')
-          })
+        .update(existingPerson.id, updatedPerson)
+        .then(returnedPerson => {
+          setPersons(persons.map(p => p.id !== existingPerson.id ? p : returnedPerson))
+          setNewName('')
+          setNewNumber('')
           setNotification(`Updated ${updatedPerson.name}'s number`)
+          setNotificationType('success')
           setTimeout(() => setNotification(null), 5000)
+        })
+        .catch(error => {
+          setNotification(error.response?.data?.error || `Information of ${existingPerson.name} has already been removed from server`)
+          setNotificationType('error')
+          setTimeout(() => setNotification(null), 5000)
+          setPersons(persons.filter(p => p.id !== existingPerson.id))
+        })
       }
     } else {
       const newPerson = { name: newName, number: newNumber }
   
       personService
-        .create(newPerson)
-        .then(returnedPerson => {
-          setPersons(persons.concat(returnedPerson))
-          setNewName('')
-          setNewNumber('')
-        })
+      .create(newPerson)
+      .then(returnedPerson => {
+        setPersons(persons.concat(returnedPerson))
+        setNewName('')
+        setNewNumber('')
         setNotification(`Added ${newPerson.name}`)
+        setNotificationType('success')
         setTimeout(() => setNotification(null), 5000)
+      })
+      .catch(error => {
+        setNotification(error.response?.data?.error || 'Failed to add person')
+        setNotificationType('error')
+        setTimeout(() => setNotification(null), 5000)
+      })
     }
   }
 
