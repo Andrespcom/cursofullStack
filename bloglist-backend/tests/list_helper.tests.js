@@ -73,3 +73,45 @@ describe('most likes', () => {
     });
   });
 });
+
+test('si likes no se define, se establece en 0', async () => {
+  const newBlog = {
+    title: 'Blog sin likes',
+    author: 'Autor sin likes',
+    url: 'http://nolikes.com',
+  }
+
+  const response = await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  expect(response.body.likes).toBe(0)
+})
+
+test('blog sin title es rechazado con status 400', async () => {
+  const newBlog = {
+    author: 'Autor sin título',
+    url: 'http://sin-titulo.com',
+    likes: 3
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(400)
+})
+
+test('blog sin url es rechazado con status 400', async () => {
+  const newBlog = {
+    title: 'Título sin URL',
+    author: 'Autor sin url',
+    likes: 4
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(400)
+})
