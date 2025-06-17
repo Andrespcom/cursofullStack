@@ -5,7 +5,8 @@
   "scripts": {
     "test": "node --test",
     "dev": "nodemon index.js",
-    "test": "jest --verbose"
+    "test": "jest --verbose",
+    "test": "NODE_ENV=test jest --verbose"
   },
   "keywords": [],
   "author": "",

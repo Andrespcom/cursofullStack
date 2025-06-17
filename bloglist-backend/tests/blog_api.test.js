@@ -5,36 +5,6 @@ const Blog = require('../models/blog')
 
 const api = supertest(app)
 
-beforeEach(async () => {
-  await Blog.deleteMany({})
-
-  const initialBlog = new Blog({
-    title: 'Initial Blog',
-    author: 'Andrés',
-    url: 'http://example.com',
-    likes: 5
-  })
-  await initialBlog.save()
-})
-
-test('blogs are returned as json', async () => {
-  await api
-    .get('/api/blogs')
-    .expect(200)
-    .expect('Content-Type', /application\/json/)
-})
-
-test('all blogs are returned', async () => {
-  const response = await api.get('/api/blogs')
-  expect(response.body).toHaveLength(1)
-})
-
-test('el identificador único del blog se llama id', async () => {
-  const response = await api.get('/api/blogs')
-  const blog = response.body[0]
-  expect(blog.id).toBeDefined()
-})
-
 const initialBlogs = [
   {
     title: 'Blog inicial 1',
@@ -49,6 +19,29 @@ const initialBlogs = [
     likes: 2,
   },
 ]
+
+beforeEach(async () => {
+  await Blog.deleteMany({})
+  await Blog.insertMany(initialBlogs)
+})
+
+test('blogs are returned as json', async () => {
+  await api
+    .get('/api/blogs')
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
+})
+
+test('all blogs are returned', async () => {
+  const response = await api.get('/api/blogs')
+  expect(response.body).toHaveLength(initialBlogs.length)
+})
+
+test('el identificador único del blog se llama id', async () => {
+  const response = await api.get('/api/blogs')
+  const blog = response.body[0]
+  expect(blog.id).toBeDefined()
+})
 
 test('a valid blog can be added', async () => {
   const newBlog = {
