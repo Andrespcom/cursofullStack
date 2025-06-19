@@ -215,6 +215,22 @@ describe('creating users with invalid data', () => {
 })
 
 
+test('un nuevo usuario puede ser creado', async () => {
+  const newUser = {
+    username: 'andresito',
+    name: 'Andrés Pro',
+    password: '1234'
+  }
+
+  const response = await api
+    .post('/api/users')
+    .send(newUser)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  expect(response.body.username).toBe('andresito')
+})
+
 afterAll(async () => {
   await mongoose.connection.close()
 })
