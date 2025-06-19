@@ -87,3 +87,21 @@ test("blog sin url es rechazado con status 400", async () => {
 
   await api.post("/api/blogs").send(newBlog).expect(400);
 });
+
+test('a blog can be updated', async () => {
+  const blogsAtStart = await Blog.find({})
+  const blogToUpdate = blogsAtStart[0]
+
+  const updatedData = {
+    ...blogToUpdate.toJSON(),
+    likes: blogToUpdate.likes + 10
+  }
+
+  const response = await api
+    .put(`/api/blogs/${blogToUpdate.id}`)
+    .send(updatedData)
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
+
+  expect(response.body.likes).toBe(blogToUpdate.likes + 10)
+})
